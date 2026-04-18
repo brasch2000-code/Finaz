@@ -123,8 +123,8 @@ export function ReviewQueue({ initialData }: { initialData: QueueItem[] }) {
               </div>
               
               <div className="flex gap-2">
-                <Button variant="outline" className="text-red-600 border-red-200 hover:bg-red-50" size="sm" onClick={() => rejectItem(item.id)}>Descartar</Button>
-                <Button size="sm" onClick={() => approveItem(item.id)} className="bg-emerald-600 hover:bg-emerald-700 text-white shadow">Consolidar ✓</Button>
+                <Button className="h-9 px-3 bg-white border border-red-200 text-red-600 hover:bg-red-50" onClick={() => rejectItem(item.id)}>Descartar</Button>
+                <Button className="h-9 px-3 bg-emerald-600 hover:bg-emerald-700 text-white shadow" onClick={() => approveItem(item.id)}>Consolidar ✓</Button>
               </div>
             </div>
           </CardContent>
