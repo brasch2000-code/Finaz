@@ -1,0 +1,3 @@
+# Finaz
+
+Financial tracker application.
