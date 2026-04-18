@@ -1,0 +1,36 @@
+// prisma/schema.prisma
+
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRES_PRISMA_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum TransactionStatus {
+  PENDING_REVIEW
+  APPROVED
+  REJECTED
+}
+
+enum TransactionFrequency {
+  ONE_TIME
+  RECURRING
+}
+
+model Transaction {
+  id          String               @id @default(cuid())
+  amount      Float
+  currency    String               @default("CLP")
+  merchant    String
+  date        DateTime
+  status      TransactionStatus    @default(PENDING_REVIEW)
+  frequency   TransactionFrequency @default(ONE_TIME)
+  group       String?
+  type        String?
+  imageUrl    String?
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+}
