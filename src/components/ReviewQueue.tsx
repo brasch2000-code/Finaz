@@ -58,7 +58,7 @@ export function ReviewQueue({ initialData }: { initialData: QueueItem[] }) {
       {items.map((item) => (
         <Card 
           key={item.id} 
-          className={\`overflow-hidden bg-white/70 backdrop-blur-sm border border-slate-100 shadow-sm transition-all duration-300 hover:shadow-md hover:border-indigo-100 \${shrinkingItem === item.id ? "scale-95 opacity-0" : "scale-100 opacity-100"}\`}
+          className={`overflow-hidden bg-white/70 backdrop-blur-sm border border-slate-100 shadow-sm transition-all duration-300 hover:shadow-md hover:border-indigo-100 ${shrinkingItem === item.id ? "scale-95 opacity-0" : "scale-100 opacity-100"}`}
         >
           <CardContent className="p-0">
             {errorMsg?.id === item.id && (
@@ -70,28 +70,28 @@ export function ReviewQueue({ initialData }: { initialData: QueueItem[] }) {
             <div className="p-5 md:p-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
               {/* Monto */}
               <div className="space-y-1.5 focus-within:text-indigo-600 transition-colors">
-                <Label htmlFor={\`amount-\${item.id}\`} className="text-xs uppercase tracking-wider font-bold text-slate-400 focus-within:text-indigo-600">Monto CLP</Label>
+                <Label htmlFor={`amount-${item.id}`} className="text-xs uppercase tracking-wider font-bold text-slate-400 focus-within:text-indigo-600">Monto CLP</Label>
                 <div className="relative">
                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-mono">$</span>
-                  <Input id={\`amount-\${item.id}\`} type="number" value={item.amount} onChange={(e) => handleUpdate(item.id, "amount", e.target.value)} className="font-mono text-lg font-semibold pl-7 bg-slate-50/50 border-slate-200 h-11 focus:ring-indigo-200" />
+                  <Input id={`amount-${item.id}`} type="number" value={item.amount} onChange={(e) => handleUpdate(item.id, "amount", e.target.value)} className="font-mono text-lg font-semibold pl-7 bg-slate-50/50 border-slate-200 h-11 focus:ring-indigo-200" />
                 </div>
               </div>
 
               {/* Comercio */}
               <div className="space-y-1.5 focus-within:text-indigo-600 transition-colors">
-                <Label htmlFor={\`merchant-\${item.id}\`} className="text-xs uppercase tracking-wider font-bold text-slate-400">Comercio</Label>
-                <Input id={\`merchant-\${item.id}\`} value={item.merchant} onChange={(e) => handleUpdate(item.id, "merchant", e.target.value)} className="font-medium text-slate-700 bg-slate-50/50 h-11 focus:ring-indigo-200" />
+                <Label htmlFor={`merchant-${item.id}`} className="text-xs uppercase tracking-wider font-bold text-slate-400">Comercio</Label>
+                <Input id={`merchant-${item.id}`} value={item.merchant} onChange={(e) => handleUpdate(item.id, "merchant", e.target.value)} className="font-medium text-slate-700 bg-slate-50/50 h-11 focus:ring-indigo-200" />
               </div>
 
               {/* Fecha */}
               <div className="space-y-1.5 focus-within:text-indigo-600 transition-colors">
-                <Label htmlFor={\`date-\${item.id}\`} className="text-xs uppercase tracking-wider font-bold text-slate-400">Fecha</Label>
-                <Input id={\`date-\${item.id}\`} type="date" value={item.date} onChange={(e) => handleUpdate(item.id, "date", e.target.value)} className="font-medium text-slate-700 bg-slate-50/50 h-11 focus:ring-indigo-200 text-sm" />
+                <Label htmlFor={`date-${item.id}`} className="text-xs uppercase tracking-wider font-bold text-slate-400">Fecha</Label>
+                <Input id={`date-${item.id}`} type="date" value={item.date} onChange={(e) => handleUpdate(item.id, "date", e.target.value)} className="font-medium text-slate-700 bg-slate-50/50 h-11 focus:ring-indigo-200 text-sm" />
               </div>
 
               {/* Tipo */}
               <div className="space-y-1.5 focus-within:text-indigo-600 transition-colors">
-                <Label htmlFor={\`type-\${item.id}\`} className="text-xs uppercase tracking-wider font-bold text-slate-400">Flujo</Label>
+                <Label htmlFor={`type-${item.id}`} className="text-xs uppercase tracking-wider font-bold text-slate-400">Flujo</Label>
                 <select 
                   className="w-full rounded-md border border-slate-200 bg-slate-50/50 px-3 h-11 text-sm font-medium text-slate-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-200 transition-shadow appearance-none"
                   value={item.type || ""} onChange={(e) => handleUpdate(item.id, "type", e.target.value)}
