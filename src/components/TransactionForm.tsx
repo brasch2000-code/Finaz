@@ -48,9 +48,15 @@ export function TransactionForm() {
     setErrorMsg(null);
     try {
       const formData = new FormData(e.currentTarget);
-      formData.set("group", groupSearch.trim()); // Forzar el valor del combobox
+      const data = {
+        amount: Number(formData.get("amount")),
+        merchant: formData.get("merchant") as string,
+        dateStr: formData.get("date") as string,
+        type: formData.get("type") as string,
+        group: groupSearch.trim()
+      };
       
-      const result = await addManualTransaction(formData);
+      const result = await addManualTransaction(data);
       if (result.success) {
         setIsOpen(false);
       } else {

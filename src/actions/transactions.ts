@@ -3,13 +3,9 @@
 import { revalidatePath } from "next/cache";
 import { dbMock } from "@/lib/db-mock";
 
-export async function addManualTransaction(formData: FormData) {
+export async function addManualTransaction(data: { amount: number; merchant: string; dateStr: string; type: string; group: string }) {
   try {
-    const amount = Number(formData.get("amount"));
-    const merchant = formData.get("merchant") as string;
-    const dateStr = formData.get("date") as string;
-    const type = formData.get("type") as string;
-    const group = formData.get("group") as string;
+    const { amount, merchant, dateStr, type, group } = data;
 
     if (!amount || !merchant || !dateStr || !type) {
       return { success: false, error: "Faltan campos obligatorios (Monto, Comercio, Fecha, Flujo)" };
