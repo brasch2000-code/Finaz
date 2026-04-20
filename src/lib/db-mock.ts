@@ -38,6 +38,12 @@ class MockDB {
     return this.transactions.filter(t => t.status === TransactionStatus.PENDING_REVIEW);
   }
 
+  async getApprovedTransactions(): Promise<Transaction[]> {
+    return this.transactions
+      .filter(t => t.status === TransactionStatus.APPROVED)
+      .sort((a, b) => b.date.getTime() - a.date.getTime());
+  }
+
   async getApprovedBalance(): Promise<number> {
     return this.transactions
       .filter(t => t.status === TransactionStatus.APPROVED)

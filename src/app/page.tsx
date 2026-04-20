@@ -1,5 +1,7 @@
 import { dbMock } from "@/lib/db-mock";
 import { ReviewQueue } from "@/components/ReviewQueue";
+import { TransactionHistory } from "@/components/TransactionHistory";
+import { TransactionForm } from "@/components/TransactionForm";
 import { PlusCircle, Wallet, ArrowUpRight, ArrowDownRight } from "lucide-react";
 
 export default async function DashboardPage() {
@@ -7,9 +9,14 @@ export default async function DashboardPage() {
   
   const approvedBalance = await dbMock.getApprovedBalance();
   const pendingTransactions = await dbMock.getPendingTransactions();
+  const approvedHistory = await dbMock.getApprovedTransactions();
 
   // Serializamos fechas para Server to Client passing
   const serializablePending = pendingTransactions.map(t => ({
+    ...t,
+    date: t.date.toISOString().split("T")[0]
+  }));
+  const serializableHistory = approvedHistory.map(t => ({
     ...t,
     date: t.date.toISOString().split("T")[0]
   }));
@@ -21,9 +28,12 @@ export default async function DashboardPage() {
           <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900 drop-shadow-sm">Consolidado Finaz</h1>
           <p className="text-slate-500 font-medium mt-2">Visión de control algorítmico y revisión OCR.</p>
         </div>
-        <button className="mt-4 md:mt-0 flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-full font-semibold shadow-md shadow-indigo-200 transition-all active:scale-95">
-          <PlusCircle className="w-5 h-5" /> Subir Voucher
-        </button>
+        <div className="flex flex-col md:flex-row gap-3">
+          <TransactionForm />
+          <button className="mt-4 md:mt-0 flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-full font-semibold shadow-md shadow-indigo-200 transition-all active:scale-95">
+            <PlusCircle className="w-5 h-5" /> Subir Voucher
+          </button>
+        </div>
       </header>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
