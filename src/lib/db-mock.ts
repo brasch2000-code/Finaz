@@ -38,6 +38,13 @@ class MockDB {
     return this.transactions.filter(t => t.status === TransactionStatus.PENDING_REVIEW);
   }
 
+  async getUsedGroups(type: string): Promise<string[]> {
+    const groups = this.transactions
+      .filter(t => t.type === type && t.group)
+      .map(t => t.group as string);
+    return Array.from(new Set(groups)).sort();
+  }
+
   async getApprovedTransactions(): Promise<Transaction[]> {
     return this.transactions
       .filter(t => t.status === TransactionStatus.APPROVED)
