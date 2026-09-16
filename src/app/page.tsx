@@ -1,88 +1,176 @@
-import { dbMock } from "@/lib/db-mock";
+import React from "react";
+import { FinancialAnalyticsService } from "@/application/analytics/financial-service";
+import { MetricCard } from "@/components/analytics/MetricCard";
+import { CashFlowChart } from "@/components/analytics/CashFlowChart";
+import { FrequencyStackedBar } from "@/components/analytics/FrequencyStackedBar";
+import { CategoryDonut } from "@/components/analytics/CategoryDonut";
 import { ReviewQueue } from "@/components/ReviewQueue";
 import { TransactionHistory } from "@/components/TransactionHistory";
 import { TransactionForm } from "@/components/TransactionForm";
-import { PlusCircle, Wallet, ArrowUpRight, ArrowDownRight } from "lucide-react";
+import { CsvUploadModal } from "@/components/etl/CsvUploadModal";
+import {
+  Wallet,
+  ArrowUpRight,
+  ArrowDownRight,
+  Percent,
+  Layers,
+  History,
+  ShieldCheck,
+  TrendingUp,
+} from "lucide-react";
+
+export const dynamic = "force-dynamic";
 
 export default async function DashboardPage() {
-  const formatCLP = (val: number) => new Intl.NumberFormat("es-CL", { style: "currency", currency: "CLP" }).format(val);
-  
-  const approvedBalance = await dbMock.getApprovedBalance();
-  const pendingTransactions = await dbMock.getPendingTransactions();
-  const approvedHistory = await dbMock.getApprovedTransactions();
+  const metrics = await FinancialAnalyticsService.getDashboardMetrics();
 
-  // Serializamos fechas para Server to Client passing
-  const serializablePending = pendingTransactions.map(t => ({
-    ...t,
-    date: t.date.toISOString().split("T")[0]
-  }));
-  const serializableHistory = approvedHistory.map(t => ({
-    ...t,
-    date: t.date.toISOString().split("T")[0]
-  }));
+  const formatCLP = (val: number) =>
+    new Intl.NumberFormat("es-CL", {
+      style: "currency",
+      currency: "CLP",
+      maximumFractionDigits: 0,
+    }).format(val);
 
   return (
-    <main className="container mx-auto max-w-6xl p-4 md:p-8 pt-12 space-y-12">
-      <header className="flex flex-col md:flex-row items-baseline justify-between border-b border-slate-200/50 pb-6">
-        <div>
-          <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900 drop-shadow-sm">Consolidado Finaz</h1>
-          <p className="text-slate-500 font-medium mt-2">Visión de control algorítmico y revisión OCR.</p>
-        </div>
-        <div className="flex flex-col md:flex-row gap-3">
-          <TransactionForm />
-          <button className="mt-4 md:mt-0 flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-full font-semibold shadow-md shadow-indigo-200 transition-all active:scale-95">
-            <PlusCircle className="w-5 h-5" /> Subir Voucher
-          </button>
+    <main className="min-h-screen bg-slate-50/50 pb-16">
+      {/* Top Navigation / App Bar */}
+      <header className="sticky top-0 z-40 border-b border-slate-200/80 bg-white/80 backdrop-blur-md">
+        <div className="container mx-auto flex max-w-7xl items-center justify-between px-4 py-4 md:px-8">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-indigo-600 text-white shadow-md shadow-indigo-200">
+              <Wallet className="h-5 w-5" />
+            </div>
+            <div>
+              <h1 className="text-xl font-black tracking-tight text-slate-900">Finaz</h1>
+              <p className="text-xs font-medium text-slate-500">
+                Financial Intelligence & Human-in-the-Loop Platform
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2.5">
+            <TransactionForm />
+            <CsvUploadModal />
+          </div>
         </div>
       </header>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        
-        {/* Panel Izquierdo: Balance */}
-        <section className="lg:col-span-5 h-min space-y-6">
-          <div className="bg-white/60 backdrop-blur-3xl border border-white shadow-xl shadow-slate-200/50 rounded-3xl p-8 relative overflow-hidden group">
-            {/* Elemento de diseño de fondo cristalino */}
-            <div className="absolute -top-24 -right-24 w-64 h-64 bg-indigo-50 rounded-full blur-3xl opacity-50 group-hover:opacity-100 transition-opacity duration-700" />
-            
-            <div className="relative z-10">
-              <div className="flex items-center gap-3 text-slate-500 font-semibold uppercase tracking-wider text-sm mb-4">
-                <Wallet className="w-5 h-5 text-indigo-500" /> Balance Activo
-              </div>
-              <div className={`text-6xl font-black tracking-tighter ${approvedBalance >= 0 ? "text-slate-800" : "text-rose-700"}`}>
-                {formatCLP(approvedBalance)}
-              </div>
-              
-              <div className="mt-8 flex items-center gap-6 pt-6 border-t border-slate-100">
-                 <div className="flex flex-col">
-                   <div className="flex items-center gap-1 text-sm font-semibold text-emerald-600">
-                     <ArrowUpRight className="w-4 h-4"/> Ingresos
-                   </div>
-                   <span className="text-lg font-bold text-slate-700">$0</span>
-                 </div>
-                 <div className="flex flex-col">
-                   <div className="flex items-center gap-1 text-sm font-semibold text-red-500">
-                     <ArrowDownRight className="w-4 h-4"/> Gastos
-                   </div>
-                   <span className="text-lg font-bold text-slate-700">$0</span>
-                 </div>
+      <div className="container mx-auto max-w-7xl px-4 pt-8 md:px-8 space-y-8">
+        {/* KPI Grid */}
+        <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <MetricCard
+            title="Balance Neto"
+            value={formatCLP(metrics.kpi.netBalance)}
+            subtitle={`${metrics.kpi.verifiedCount} transacciones auditadas`}
+            icon={Wallet}
+            variant={metrics.kpi.netBalance >= 0 ? "emerald" : "rose"}
+          />
+          <MetricCard
+            title="Ingresos Totales"
+            value={formatCLP(metrics.kpi.totalIncome)}
+            subtitle="Flujo positivo verificado"
+            icon={ArrowUpRight}
+            variant="emerald"
+          />
+          <MetricCard
+            title="Gastos Totales"
+            value={formatCLP(metrics.kpi.totalExpense)}
+            subtitle="Flujo de egresos consolidado"
+            icon={ArrowDownRight}
+            variant="rose"
+          />
+          <MetricCard
+            title="Tasa de Ahorro"
+            value={`${metrics.kpi.savingsRate}%`}
+            subtitle={`Gasto Fijo: ${metrics.kpi.fixedCostRatio}% del egreso`}
+            icon={Percent}
+            variant={metrics.kpi.savingsRate >= 20 ? "indigo" : "amber"}
+          />
+        </section>
+
+        {/* Analytics Section: Charts */}
+        <section className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+          {/* Cash Flow Evolution */}
+          <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-xs lg:col-span-8">
+            <div className="mb-4 flex items-center justify-between">
+              <div>
+                <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                  <TrendingUp className="h-4 w-4 text-indigo-600" />
+                  Evolución del Flujo de Caja
+                </h2>
+                <p className="text-xs text-slate-500">
+                  Comparativa mensual de ingresos, gastos y ahorro neto
+                </p>
               </div>
             </div>
+            <CashFlowChart data={metrics.cashFlowTrend} />
+          </div>
+
+          {/* Categorical Distribution */}
+          <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-xs lg:col-span-4">
+            <div className="mb-4 flex items-center justify-between">
+              <div>
+                <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                  <Layers className="h-4 w-4 text-indigo-600" />
+                  Gasto por Categoría
+                </h2>
+                <p className="text-xs text-slate-500">
+                  Distribución relativa de egresos verificados
+                </p>
+              </div>
+            </div>
+            <CategoryDonut data={metrics.categoryDistribution} />
           </div>
         </section>
 
-        {/* Panel Derecho: Review Queue */}
-        <section className="lg:col-span-7 flex flex-col">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold text-slate-800">Bandeja de Revisión AI</h2>
-            <span className="bg-amber-100 text-amber-800 text-xs font-bold px-3 py-1 rounded-full animate-pulse border border-amber-200">
-              {pendingTransactions.length} PENDIENTES
-            </span>
+        {/* Frequency Breakdown & HITL Review Queue */}
+        <section className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+          {/* Frequency Stacked Bar */}
+          <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-xs lg:col-span-5">
+            <div className="mb-4">
+              <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                <Layers className="h-4 w-4 text-indigo-600" />
+                Estructura por Frecuencia
+              </h2>
+              <p className="text-xs text-slate-500">
+                Fijo (Estructural) vs Recurrente (Operativo) vs Esporádico (Discrecional)
+              </p>
+            </div>
+            <FrequencyStackedBar data={metrics.frequencyStacked} />
           </div>
-          <div className="flex-1 bg-white/40 backdrop-blur-xl border border-white rounded-3xl p-2 md:p-6 shadow-sm">
-            <ReviewQueue initialData={serializablePending as any} />
+
+          {/* HITL Review Queue */}
+          <div className="rounded-3xl border border-slate-100 bg-white p-6 shadow-xs lg:col-span-7">
+            <div className="mb-4 flex items-center justify-between">
+              <div>
+                <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                  <ShieldCheck className="h-4 w-4 text-indigo-600" />
+                  Cola de Auditoría (HITL)
+                </h2>
+                <p className="text-xs text-slate-500">
+                  Validación humana de transacciones inferidas por OmniRouter
+                </p>
+              </div>
+            </div>
+            <ReviewQueue initialPending={metrics.pendingTransactions} />
           </div>
         </section>
 
+        {/* Verified Transactions History */}
+        <section className="rounded-3xl border border-slate-100 bg-white p-6 shadow-xs">
+          <div className="mb-6 flex items-center justify-between">
+            <div>
+              <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
+                <History className="h-4 w-4 text-indigo-600" />
+                Historial de Transacciones Auditadas
+              </h2>
+              <p className="text-xs text-slate-500">
+                Últimos registros verificados en el libro mayor
+              </p>
+            </div>
+          </div>
+          <TransactionHistory transactions={metrics.recentTransactions} />
+        </section>
       </div>
     </main>
   );

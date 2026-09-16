@@ -1,5 +1,5 @@
 {
-  "name": "tempapp",
+  "name": "finaz",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -7,30 +7,42 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "test": "vitest run",
     "postinstall": "prisma generate"
   },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
   "dependencies": {
+    "@ai-sdk/anthropic": "^4.0.54",
+    "@ai-sdk/openai": "^4.0.67",
+    "@prisma/client": "^5.22.0",
+    "ai": "^7.0.102",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.1",
+    "csv-parse": "^7.0.2",
+    "lucide-react": "^1.46.0",
     "next": "16.2.4",
     "react": "19.2.4",
     "react-dom": "19.2.4",
-    "@prisma/client": "^5.14.0",
-    "zod": "^3.23.8",
-    "ai": "latest",
-    "@ai-sdk/openai": "latest",
-    "lucide-react": "^0.378.0",
-    "clsx": "^2.1.1",
+    "react-is": "^19.3.0",
+    "recharts": "^3.10.1",
     "tailwind-merge": "^2.3.0",
-    "class-variance-authority": "^0.7.0"
+    "zod": "^3.23.8"
   },
   "devDependencies": {
-    "prisma": "^5.14.0",
     "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
+    "@types/csv-parse": "^1.1.12",
+    "@types/node": "^20.19.43",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.2.4",
+    "prisma": "^5.22.0",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "tsx": "^4.23.13",
+    "typescript": "^5",
+    "vite": "^8.3.0",
+    "vitest": "^5.0.1"
   }
 }
