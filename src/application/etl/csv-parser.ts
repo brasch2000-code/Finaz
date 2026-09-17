@@ -45,12 +45,28 @@ export function parseChileanCurrency(value: string | number | undefined | null):
   return isNaN(parsed) ? 0 : Math.abs(parsed);
 }
 
+const SPANISH_MONTH_MAP: Record<string, string> = {
+  ene: "01",
+  feb: "02",
+  mar: "03",
+  abr: "04",
+  may: "05",
+  jun: "06",
+  jul: "07",
+  ago: "08",
+  sep: "09",
+  set: "09",
+  oct: "10",
+  nov: "11",
+  dic: "12",
+};
+
 export function parseDateFlexible(dateStr?: string | null): Date {
   if (!dateStr) return new Date();
   const trimmed = dateStr.trim();
 
-  // Handle DD/MM/YYYY or DD-MM-YYYY
-  const ddmmyyyyMatch = trimmed.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+  // 1. Handle DD/MM/YYYY, DD-MM-YYYY, DD.MM.YYYY (4-digit year)
+  const ddmmyyyyMatch = trimmed.match(/^(\d{1,2})[\/\-\.](\d{1,2})[\/\-](\d{4})$/);
   if (ddmmyyyyMatch) {
     const day = parseInt(ddmmyyyyMatch[1], 10);
     const month = parseInt(ddmmyyyyMatch[2], 10) - 1;
@@ -58,7 +74,44 @@ export function parseDateFlexible(dateStr?: string | null): Date {
     return new Date(Date.UTC(year, month, day, 12, 0, 0));
   }
 
-  // Handle YYYY-MM-DD
+  // 2. Handle DD/MM/YY, DD-MM-YY, DD.MM.YY (2-digit year, e.g. 14/08/26 -> 2026-08-14)
+  const ddmmyyMatch = trimmed.match(/^(\d{1,2})[\/\-\.](\d{1,2})[\/\-](\d{2})$/);
+  if (ddmmyyMatch) {
+    const day = parseInt(ddmmyyMatch[1], 10);
+    const month = parseInt(ddmmyyMatch[2], 10) - 1;
+    const shortYear = parseInt(ddmmyyMatch[3], 10);
+    const fullYear = shortYear >= 70 ? 1900 + shortYear : 2000 + shortYear;
+    return new Date(Date.UTC(fullYear, month, day, 12, 0, 0));
+  }
+
+  // 3. Handle DD/MM or DD-MM (without year, assume current year)
+  const ddmmMatch = trimmed.match(/^(\d{1,2})[\/\-\.](\d{1,2})$/);
+  if (ddmmMatch) {
+    const day = parseInt(ddmmMatch[1], 10);
+    const month = parseInt(ddmmMatch[2], 10) - 1;
+    const currentYear = new Date().getFullYear();
+    return new Date(Date.UTC(currentYear, month, day, 12, 0, 0));
+  }
+
+  // 4. Handle Spanish textual months e.g. "14 AGO 2026", "14-AGO-26", "14 AGO"
+  const textMonthMatch = trimmed.match(
+    /^(\d{1,2})(?:[\/\-\s]+)([a-zA-Z]{3,4})(?:(?:[\/\-\s]+)(\d{2,4}))?$/i
+  );
+  if (textMonthMatch) {
+    const day = parseInt(textMonthMatch[1], 10);
+    const mStr = textMonthMatch[2].toLowerCase().slice(0, 3);
+    const monthNum = SPANISH_MONTH_MAP[mStr];
+    if (monthNum) {
+      const month = parseInt(monthNum, 10) - 1;
+      let year = textMonthMatch[3] ? parseInt(textMonthMatch[3], 10) : new Date().getFullYear();
+      if (year < 100) {
+        year = year >= 70 ? 1900 + year : 2000 + year;
+      }
+      return new Date(Date.UTC(year, month, day, 12, 0, 0));
+    }
+  }
+
+  // 5. Handle standard ISO strings (YYYY-MM-DD)
   const isoDate = new Date(trimmed);
   return isNaN(isoDate.getTime()) ? new Date() : isoDate;
 }
@@ -75,11 +128,13 @@ export function generateTransactionHash(
   date: Date,
   description: string,
   amount: number,
-  flowType: string
+  flowType: string,
+  occurrenceIndex?: number
 ): string {
   const dateStr = date.toISOString().split("T")[0];
   const descStr = description.trim().toLowerCase().replace(/\s+/g, " ");
-  const rawKey = `${dateStr}|${descStr}|${amount.toFixed(2)}|${flowType}`;
+  const occurrenceSuffix = occurrenceIndex && occurrenceIndex > 0 ? `|#${occurrenceIndex}` : "";
+  const rawKey = `${dateStr}|${descStr}|${amount.toFixed(2)}|${flowType}${occurrenceSuffix}`;
   return createHash("sha256").update(rawKey).digest("hex");
 }
 

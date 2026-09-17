@@ -28,6 +28,7 @@ enum TransactionStatus {
 
 enum TransactionSource {
   CSV_IMPORT
+  PDF_IMPORT
   OCR_RECEIPT
   MANUAL
   API
