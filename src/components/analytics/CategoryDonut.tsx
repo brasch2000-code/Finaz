@@ -9,12 +9,26 @@ interface CategoryDonutProps {
 }
 
 export function CategoryDonut({ data }: CategoryDonutProps) {
+  const [mounted, setMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const formatCLP = (val: number) =>
     new Intl.NumberFormat("es-CL", {
       style: "currency",
       currency: "CLP",
       maximumFractionDigits: 0,
     }).format(val);
+
+  if (!mounted) {
+    return (
+      <div className="flex h-64 items-center justify-center rounded-2xl bg-slate-50/40 text-xs text-slate-400">
+        Cargando distribución...
+      </div>
+    );
+  }
 
   if (!data || data.length === 0) {
     return (
