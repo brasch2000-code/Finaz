@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { FlowTypeEnum, FrequencyTypeEnum } from "./classification";
+import { FrequencyTypeEnum } from "./classification";
 
 export const StatementMovementTypeEnum = z.enum(["CARGO", "ABONO"]);
 

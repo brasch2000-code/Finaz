@@ -2,10 +2,9 @@ import { describe, it, expect } from "vitest";
 import {
   detectBank,
   parseSantanderStatementLines,
-  parseGenericChileanStatementLines,
   parseStatementLinesUniversal,
 } from "../bank-statement-parser";
-import { parseDateFlexible, generateTransactionHash } from "../csv-parser";
+import { parseDateFlexible } from "../csv-parser";
 
 describe("Bank Statement Parser - Bank Detection", () => {
   it("should detect Banco Santander from statement headers and keywords", () => {

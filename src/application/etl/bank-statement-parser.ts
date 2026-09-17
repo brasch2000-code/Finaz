@@ -320,7 +320,7 @@ export function parseStatementLinesUniversal(
 
     // 2. Limpieza de tokens y extracción de montos y descripción
     // Remover cuotas del final (ej. "01/01", "01/03", "C/01")
-    let cleanRemaining = remaining.replace(/\s+\d{1,2}\/\d{1,2}\s*$/, "").trim();
+    const cleanRemaining = remaining.replace(/\s+\d{1,2}\/\d{1,2}\s*$/, "").trim();
 
     // Tokenizar la parte restante
     const tokens = cleanRemaining.split(/\s+/);
@@ -347,7 +347,7 @@ export function parseStatementLinesUniversal(
       }
     }
 
-    let rawDescTokens = tokens.slice(0, i + 1);
+    const rawDescTokens = tokens.slice(0, i + 1);
 
     // Limpiar descripción de códigos sucios, auth codes iniciales y ciudades
     let cleanDesc = rawDescTokens

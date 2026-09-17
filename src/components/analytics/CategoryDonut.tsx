@@ -8,12 +8,14 @@ interface CategoryDonutProps {
   data: CategoryBreakdown[];
 }
 
-export function CategoryDonut({ data }: CategoryDonutProps) {
-  const [mounted, setMounted] = React.useState(false);
+const emptySubscribe = () => () => {};
 
-  React.useEffect(() => {
-    setMounted(true);
-  }, []);
+export function CategoryDonut({ data }: CategoryDonutProps) {
+  const isClient = React.useSyncExternalStore(
+    emptySubscribe,
+    () => true,
+    () => false
+  );
 
   const formatCLP = (val: number) =>
     new Intl.NumberFormat("es-CL", {
@@ -22,7 +24,7 @@ export function CategoryDonut({ data }: CategoryDonutProps) {
       maximumFractionDigits: 0,
     }).format(val);
 
-  if (!mounted) {
+  if (!isClient) {
     return (
       <div className="flex h-64 items-center justify-center rounded-2xl bg-slate-50/40 text-xs text-slate-400">
         Cargando distribución...
