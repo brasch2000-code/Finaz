@@ -188,9 +188,8 @@ export function detectBank(text: string): BankDetectionResult {
 // 2. Reconstrucción Espacial de Filas por Coordenadas Y (Y-Banding)
 // --------------------------------------------------------------------------
 export async function extractStructuredTextFromPdf(
-  fileBuffer: Uint8Array
+  pdfProxy: Awaited<ReturnType<typeof getDocumentProxy>>
 ): Promise<string> {
-  const pdfProxy = await getDocumentProxy(fileBuffer);
   let fullText = "";
 
   for (let pageNum = 1; pageNum <= pdfProxy.numPages; pageNum++) {
@@ -564,17 +563,17 @@ export async function parseTransactionsPdf(
   const uint8 = new Uint8Array(fileBuffer);
 
   // Paso 1: Extracción de texto estructurado mediante Y-banding posicional
-  let extractedText = "";
-  let totalPages = 1;
+  // IMPORTANTE: getDocumentProxy transfiere (detach) el ArrayBuffer subyacente
+  // al worker interno de unpdf, por lo que sólo puede invocarse UNA VEZ por
+  // buffer. El proxy resultante se reutiliza para todas las operaciones.
+  const pdfProxy = await getDocumentProxy(uint8);
+  const totalPages = pdfProxy.numPages;
 
+  let extractedText = "";
   try {
-    extractedText = await extractStructuredTextFromPdf(uint8);
-    const pdfProxy = await getDocumentProxy(uint8);
-    totalPages = pdfProxy.numPages;
+    extractedText = await extractStructuredTextFromPdf(pdfProxy);
   } catch (extractErr) {
     console.warn("[StatementParser] Spatial extraction failed, falling back to raw unpdf:", extractErr);
-    const pdfProxy = await getDocumentProxy(uint8);
-    totalPages = pdfProxy.numPages;
     const { text } = await extractText(pdfProxy, { mergePages: true });
     extractedText = text;
   }
